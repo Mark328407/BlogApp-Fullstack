@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <div class="form-page">
-      <div v-if="postsStore.loading && !form.title" class="spinner">Loading post...</div>
+      <div v-if="postsStore.loading && !form.title" class="spinner">
+        Loading post...
+      </div>
 
       <template v-else>
         <div class="auth-header">
@@ -16,13 +18,22 @@
               <label>Title</label>
               <input v-model="form.title" type="text" required minlength="3" />
             </div>
+
             <div class="form-group">
               <label>Content</label>
               <textarea v-model="form.content" required minlength="10" rows="10"></textarea>
             </div>
+
             <div class="form-actions">
-              <router-link :to="`/posts/${id}`" class="btn btn-secondary">Cancel</router-link>
-              <button type="submit" class="btn btn-primary" :disabled="postsStore.loading">
+              <router-link :to="`/posts/${id}`" class="btn btn-secondary">
+                Cancel
+              </router-link>
+
+              <button
+                type="submit"
+                class="btn btn-primary"
+                :disabled="postsStore.loading"
+              >
                 {{ postsStore.loading ? 'Saving...' : 'Save Changes' }}
               </button>
             </div>
@@ -42,11 +53,17 @@ import { notyf } from '../main'
 const postsStore = usePostsStore()
 const route = useRoute()
 const router = useRouter()
+
+
 const id = route.params.id
+
 const form = ref({ title: '', content: '' })
 
 onMounted(async () => {
+  console.log('Edit ID:', id) // debug
+
   await postsStore.fetchOne(id)
+
   if (postsStore.currentPost) {
     form.value.title = postsStore.currentPost.title
     form.value.content = postsStore.currentPost.content
@@ -55,6 +72,7 @@ onMounted(async () => {
 
 async function handleUpdate() {
   const result = await postsStore.update(id, form.value)
+
   if (result.success) {
     notyf.success('Post updated successfully!')
     setTimeout(() => router.push(`/posts/${id}`), 800)
@@ -63,22 +81,3 @@ async function handleUpdate() {
   }
 }
 </script>
-
-<style scoped>
-.form-page { max-width: 640px; margin: 0 auto; }
-.auth-header { margin-bottom: 1.8rem; }
-.auth-eyebrow {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  font-weight: 500;
-  margin-bottom: 0.4rem;
-}
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-</style>
