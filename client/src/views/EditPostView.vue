@@ -21,7 +21,7 @@
               <textarea v-model="form.content" required minlength="10" rows="10"></textarea>
             </div>
             <div class="form-actions">
-              <router-link :to="`/posts/${route.params.id}`" class="btn btn-secondary">Cancel</router-link>
+              <router-link :to="`/posts/${id}`" class="btn btn-secondary">Cancel</router-link>
               <button type="submit" class="btn btn-primary" :disabled="postsStore.loading">
                 {{ postsStore.loading ? 'Saving...' : 'Save Changes' }}
               </button>
@@ -42,10 +42,11 @@ import { notyf } from '../main'
 const postsStore = usePostsStore()
 const route = useRoute()
 const router = useRouter()
+const id = route.params.id
 const form = ref({ title: '', content: '' })
 
 onMounted(async () => {
-  await postsStore.fetchOne(route.params.id)
+  await postsStore.fetchOne(id)
   if (postsStore.currentPost) {
     form.value.title = postsStore.currentPost.title
     form.value.content = postsStore.currentPost.content
@@ -53,10 +54,10 @@ onMounted(async () => {
 })
 
 async function handleUpdate() {
-  const result = await postsStore.update(route.params.id, form.value)
+  const result = await postsStore.update(id, form.value)
   if (result.success) {
     notyf.success('Post updated successfully!')
-    setTimeout(() => router.push(`/posts/${route.params.id}`), 800)
+    setTimeout(() => router.push(`/posts/${id}`), 800)
   } else {
     notyf.error(result.message || 'Failed to update post.')
   }
