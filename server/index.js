@@ -9,7 +9,13 @@ const postRoutes = require('./routes/posts');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors()); // Handle preflight requests
+
 app.use(express.json());
 
 // Routes
@@ -18,7 +24,7 @@ app.use('/api/posts', postRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ message: 'S87 Blog API is running!' });
+  res.json({ message: 'The API is running!' });
 });
 
 // 404 handler
