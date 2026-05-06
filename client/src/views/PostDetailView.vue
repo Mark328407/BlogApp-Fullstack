@@ -19,13 +19,10 @@
         <div class="post-content">{{ post.content }}</div>
 
         <footer class="post-footer">
-          <!-- Owner: can Edit + Delete -->
           <template v-if="isOwner">
             <router-link :to="`/posts/${post._id}/edit`" class="btn btn-secondary">Edit Post</router-link>
             <button class="btn btn-danger" @click="handleDelete">Delete Post</button>
           </template>
-
-          <!-- Admin: can only Delete any post -->
           <template v-else-if="auth.isAdmin">
             <button class="btn btn-danger" @click="handleDelete">Delete Post</button>
           </template>
@@ -40,6 +37,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostsStore } from '../stores/posts'
 import { useAuthStore } from '../stores/auth'
+import { notyf } from '../main'
 
 const route = useRoute()
 const router = useRouter()
@@ -48,7 +46,6 @@ const auth = useAuthStore()
 
 const post = computed(() => postsStore.currentPost)
 
-// Check if logged-in user owns this post
 const isOwner = computed(() => {
   if (!auth.isLoggedIn || !auth.user || !post.value) return false
   const userId = String(auth.user._id || auth.user.id || '')
@@ -61,7 +58,12 @@ onMounted(() => postsStore.fetchOne(route.params.id))
 async function handleDelete() {
   if (!confirm('Delete this post?')) return
   const result = await postsStore.remove(post.value._id)
-  if (result.success) router.push('/posts')
+  if (result.success) {
+    notyf.success('Post deleted successfully!')
+    router.push('/posts')
+  } else {
+    notyf.error(result.message || 'Failed to delete post.')
+  }
 }
 
 function formatDate(date) {
@@ -78,11 +80,8 @@ function formatDate(date) {
   transition: color 0.2s;
 }
 .back-link:hover { color: var(--ink); }
-
 .post-detail { max-width: 680px; }
-
 .post-header { margin-bottom: 2rem; }
-
 .post-meta {
   display: flex;
   align-items: center;
@@ -91,17 +90,14 @@ function formatDate(date) {
   color: var(--muted);
   margin-bottom: 0.75rem;
 }
-
 .post-author { color: var(--accent); font-weight: 500; }
 .dot { color: var(--border); }
-
 .post-title {
   font-family: 'Playfair Display', serif;
   font-size: clamp(1.8rem, 4vw, 2.6rem);
   font-weight: 900;
   line-height: 1.15;
 }
-
 .post-content {
   font-size: 1.05rem;
   line-height: 1.8;
@@ -111,6 +107,5 @@ function formatDate(date) {
   border-bottom: 1px solid var(--border);
   margin-bottom: 1.5rem;
 }
-
 .post-footer { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 </style>

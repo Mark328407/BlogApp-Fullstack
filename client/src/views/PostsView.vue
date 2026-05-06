@@ -1,167 +1,83 @@
 <template>
   <div class="container">
-    <div class="posts-header">
-      <div>
-        <h1 class="page-title">All Posts</h1>
-        <p class="page-sub">{{ posts.length }} {{ posts.length === 1 ? 'post' : 'posts' }} published</p>
-      </div>
-      <router-link v-if="auth.isLoggedIn" to="/posts/create" class="btn btn-primary">+ Write Post</router-link>
-    </div>
+    <div class="form-page">
+      <div v-if="postsStore.loading && !form.title" class="spinner">Loading post...</div>
 
-    <div v-if="postsStore.loading" class="spinner">Loading posts...</div>
-    <div v-else-if="postsStore.error" class="alert alert-error">{{ postsStore.error }}</div>
-
-    <div v-else-if="posts.length === 0" class="empty-state">
-      <p>No posts yet. Be the first to write one!</p>
-      <router-link v-if="auth.isLoggedIn" to="/posts/create" class="btn btn-primary" style="margin-top:1rem">Write a Post</router-link>
-    </div>
-
-    <div v-else class="posts-grid">
-      <div v-for="post in posts" :key="post._id" class="post-card">
-        <div class="post-card-body">
-          <p class="post-author">{{ post.author?.username || 'Unknown' }}</p>
-          <h2 class="post-title">{{ post.title }}</h2>
-          <p class="post-excerpt">{{ truncate(post.content) }}</p>
+      <template v-else>
+        <div class="auth-header">
+          <p class="auth-eyebrow">Edit Post</p>
+          <h1 class="page-title">Update Post</h1>
+          <p class="page-sub">Make changes and save.</p>
         </div>
-        <div class="post-card-footer">
-          <span class="post-date">{{ formatDate(post.createdAt) }}</span>
-          <div class="post-actions">
 
-            <!-- Everyone can Read -->
-            <router-link :to="`/posts/${post._id}`" class="btn btn-secondary btn-sm">Read</router-link>
-
-            <!-- Owner can Edit + Delete their own post -->
-            <template v-if="isOwner(post)">
-              <router-link :to="`/posts/${post._id}/edit`" class="btn btn-secondary btn-sm">Edit</router-link>
-              <button class="btn btn-danger btn-sm" @click="handleDelete(post._id)">Delete</button>
-            </template>
-
-            <!-- Admin can Delete any post (but not edit others) -->
-            <template v-else-if="auth.isAdmin">
-              <button class="btn btn-danger btn-sm" @click="handleDelete(post._id)">Delete</button>
-            </template>
-
-          </div>
+        <div class="card">
+          <form @submit.prevent="handleUpdate">
+            <div class="form-group">
+              <label>Title</label>
+              <input v-model="form.title" type="text" required minlength="3" />
+            </div>
+            <div class="form-group">
+              <label>Content</label>
+              <textarea v-model="form.content" required minlength="10" rows="10"></textarea>
+            </div>
+            <div class="form-actions">
+              <router-link :to="`/posts/${route.params.id}`" class="btn btn-secondary">Cancel</router-link>
+              <button type="submit" class="btn btn-primary" :disabled="postsStore.loading">
+                {{ postsStore.loading ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { usePostsStore } from '../stores/posts'
-import { useAuthStore } from '../stores/auth'
+import { notyf } from '../main'
 
 const postsStore = usePostsStore()
-const auth = useAuthStore()
-const posts = computed(() => postsStore.posts)
+const route = useRoute()
+const router = useRouter()
+const form = ref({ title: '', content: '' })
 
-onMounted(() => postsStore.fetchAll())
+onMounted(async () => {
+  await postsStore.fetchOne(route.params.id)
+  if (postsStore.currentPost) {
+    form.value.title = postsStore.currentPost.title
+    form.value.content = postsStore.currentPost.content
+  }
+})
 
-// Check if the logged-in user is the owner of the post
-function isOwner(post) {
-  if (!auth.isLoggedIn || !auth.user) return false
-  const userId = String(auth.user._id || auth.user.id || '')
-  const authorId = String(post.author?._id || post.author?.id || '')
-  return userId !== '' && authorId !== '' && userId === authorId
-}
-
-async function handleDelete(id) {
-  if (!confirm('Are you sure you want to delete this post?')) return
-  await postsStore.remove(id)
-}
-
-function truncate(text, len = 120) {
-  return text.length > len ? text.slice(0, len) + '…' : text
-}
-
-function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+async function handleUpdate() {
+  const result = await postsStore.update(route.params.id, form.value)
+  if (result.success) {
+    notyf.success('Post updated successfully!')
+    setTimeout(() => router.push(`/posts/${route.params.id}`), 800)
+  } else {
+    notyf.error(result.message || 'Failed to update post.')
+  }
 }
 </script>
 
 <style scoped>
-.posts-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.posts-grid {
-  display: grid;
-  gap: 1.2rem;
-}
-
-.post-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.4rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-
-.post-card:hover {
-  box-shadow: var(--shadow);
-  border-color: var(--accent-light);
-}
-
-.post-card-body { flex: 1; }
-
-.post-author {
+.form-page { max-width: 640px; margin: 0 auto; }
+.auth-header { margin-bottom: 1.8rem; }
+.auth-eyebrow {
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--accent);
   font-weight: 500;
   margin-bottom: 0.4rem;
 }
-
-.post-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.25;
-  margin-bottom: 0.5rem;
-}
-
-.post-excerpt {
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.post-card-footer {
+.form-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.post-date {
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.post-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-.btn-sm {
-  padding: 0.35rem 0.8rem;
-  font-size: 0.8rem;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 4rem 1rem;
-  color: var(--muted);
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }
 </style>

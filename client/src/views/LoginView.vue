@@ -8,8 +8,6 @@
       </div>
 
       <div class="card">
-        <div v-if="error" class="alert alert-error">{{ error }}</div>
-
         <form @submit.prevent="handleLogin">
           <div class="form-group">
             <label>Email</label>
@@ -37,20 +35,19 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { notyf } from '../main'
 
 const auth = useAuthStore()
 const router = useRouter()
-const error = ref('')
-
 const form = ref({ email: '', password: '' })
 
 async function handleLogin() {
-  error.value = ''
   const result = await auth.login(form.value)
   if (result.success) {
+    notyf.success('Welcome back! Logged in successfully.')
     router.push('/posts')
   } else {
-    error.value = result.message
+    notyf.error(result.message || 'Login failed.')
   }
 }
 </script>

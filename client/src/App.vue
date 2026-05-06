@@ -26,6 +26,7 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
+import { notyf } from './main'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -34,6 +35,7 @@ onMounted(() => auth.fetchMe())
 
 function handleLogout() {
   auth.logout()
+  notyf.success('Logged out successfully.')
   router.push('/')
 }
 </script>
@@ -64,7 +66,6 @@ body {
 
 a { color: inherit; text-decoration: none; }
 
-/* NAVBAR */
 .navbar {
   display: flex;
   align-items: center;
@@ -93,18 +94,10 @@ a { color: inherit; text-decoration: none; }
   font-weight: 500;
 }
 
-.nav-links a {
-  color: var(--cream);
-  transition: color 0.2s;
-}
-.nav-links a:hover, .nav-links a.router-link-active {
-  color: var(--accent-light);
-}
+.nav-links a { color: var(--cream); transition: color 0.2s; }
+.nav-links a:hover, .nav-links a.router-link-active { color: var(--accent-light); }
 
-.nav-user {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
+.nav-user { color: var(--muted); font-size: 0.85rem; }
 
 .btn-register {
   background: var(--accent);
@@ -126,21 +119,11 @@ a { color: inherit; text-decoration: none; }
   font-family: 'DM Sans', sans-serif;
   transition: all 0.2s;
 }
-.btn-logout:hover {
-  border-color: var(--accent-light);
-  color: var(--accent-light);
-}
+.btn-logout:hover { border-color: var(--accent-light); color: var(--accent-light); }
 
-.main-content {
-  min-height: calc(100vh - 64px);
-}
+.main-content { min-height: calc(100vh - 64px); }
 
-/* SHARED UTILITIES */
-.container {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem;
-}
+.container { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem; }
 
 .page-title {
   font-family: 'Playfair Display', serif;
@@ -150,11 +133,7 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 0.5rem;
 }
 
-.page-sub {
-  color: var(--muted);
-  font-size: 0.95rem;
-  margin-bottom: 2rem;
-}
+.page-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
 
 .card {
   background: var(--card);
@@ -164,9 +143,7 @@ a { color: inherit; text-decoration: none; }
   box-shadow: var(--shadow);
 }
 
-.form-group {
-  margin-bottom: 1.2rem;
-}
+.form-group { margin-bottom: 1.2rem; }
 
 .form-group label {
   display: block;
@@ -192,15 +169,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-}
+.form-group textarea:focus { outline: none; border-color: var(--accent); }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 120px;
-}
+.form-group textarea { resize: vertical; min-height: 120px; }
 
 .btn {
   display: inline-block;
@@ -214,41 +185,19 @@ a { color: inherit; text-decoration: none; }
   transition: all 0.2s;
 }
 
-.btn-primary {
-  background: var(--accent);
-  color: white;
-}
+.btn-primary { background: var(--accent); color: white; }
 .btn-primary:hover:not(:disabled) { background: var(--accent-light); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.btn-secondary {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--ink);
-}
+.btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--ink); }
 .btn-secondary:hover { border-color: var(--ink); }
 
-.btn-danger {
-  background: transparent;
-  border: 1px solid #e05252;
-  color: #e05252;
-}
+.btn-danger { background: transparent; border: 1px solid #e05252; color: #e05252; }
 .btn-danger:hover { background: #e05252; color: white; }
 
-.alert {
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
+.alert { padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.9rem; margin-bottom: 1rem; }
 .alert-error { background: #fef2f2; color: #c0392b; border: 1px solid #f5c6c6; }
 .alert-success { background: #f0fdf4; color: #2e7d52; border: 1px solid #bbf7d0; }
 
-.spinner {
-  display: flex;
-  justify-content: center;
-  padding: 3rem;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
+.spinner { display: flex; justify-content: center; padding: 3rem; color: var(--muted); font-size: 0.9rem; }
 </style>

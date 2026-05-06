@@ -11,27 +11,14 @@
         </div>
 
         <div class="card">
-          <div v-if="error" class="alert alert-error">{{ error }}</div>
-          <div v-if="success" class="alert alert-success">{{ success }}</div>
-
           <form @submit.prevent="handleUpdate">
             <div class="form-group">
               <label>Title</label>
-              <input
-                v-model="form.title"
-                type="text"
-                required
-                minlength="3"
-              />
+              <input v-model="form.title" type="text" required minlength="3" />
             </div>
             <div class="form-group">
               <label>Content</label>
-              <textarea
-                v-model="form.content"
-                required
-                minlength="10"
-                rows="10"
-              ></textarea>
+              <textarea v-model="form.content" required minlength="10" rows="10"></textarea>
             </div>
             <div class="form-actions">
               <router-link :to="`/posts/${route.params.id}`" class="btn btn-secondary">Cancel</router-link>
@@ -50,13 +37,11 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostsStore } from '../stores/posts'
+import { notyf } from '../main'
 
 const postsStore = usePostsStore()
 const route = useRoute()
 const router = useRouter()
-const error = ref('')
-const success = ref('')
-
 const form = ref({ title: '', content: '' })
 
 onMounted(async () => {
@@ -68,14 +53,12 @@ onMounted(async () => {
 })
 
 async function handleUpdate() {
-  error.value = ''
-  success.value = ''
   const result = await postsStore.update(route.params.id, form.value)
   if (result.success) {
-    success.value = 'Post updated!'
+    notyf.success('Post updated successfully!')
     setTimeout(() => router.push(`/posts/${route.params.id}`), 800)
   } else {
-    error.value = result.message
+    notyf.error(result.message || 'Failed to update post.')
   }
 }
 </script>

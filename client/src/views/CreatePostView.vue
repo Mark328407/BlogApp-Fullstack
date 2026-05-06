@@ -8,8 +8,6 @@
       </div>
 
       <div class="card">
-        <div v-if="error" class="alert alert-error">{{ error }}</div>
-
         <form @submit.prevent="handleCreate">
           <div class="form-group">
             <label>Title</label>
@@ -47,20 +45,19 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePostsStore } from '../stores/posts'
+import { notyf } from '../main'
 
 const postsStore = usePostsStore()
 const router = useRouter()
-const error = ref('')
-
 const form = ref({ title: '', content: '' })
 
 async function handleCreate() {
-  error.value = ''
   const result = await postsStore.create(form.value)
   if (result.success) {
+    notyf.success('Post published successfully!')
     router.push(`/posts/${result.post._id}`)
   } else {
-    error.value = result.message
+    notyf.error(result.message || 'Failed to create post.')
   }
 }
 </script>

@@ -8,9 +8,6 @@
       </div>
 
       <div class="card">
-        <div v-if="error" class="alert alert-error">{{ error }}</div>
-        <div v-if="success" class="alert alert-success">{{ success }}</div>
-
         <form @submit.prevent="handleRegister">
           <div class="form-group">
             <label>Username</label>
@@ -42,22 +39,19 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { notyf } from '../main'
 
 const auth = useAuthStore()
 const router = useRouter()
-const error = ref('')
-const success = ref('')
-
 const form = ref({ username: '', email: '', password: '' })
 
 async function handleRegister() {
-  error.value = ''
-  success.value = ''
   const result = await auth.register(form.value)
   if (result.success) {
+    notyf.success('Account created successfully! Welcome!')
     router.push('/posts')
   } else {
-    error.value = result.message
+    notyf.error(result.message || 'Registration failed.')
   }
 }
 </script>
