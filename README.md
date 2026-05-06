@@ -1,8 +1,8 @@
-# S88 Blog App — VueJS Frontend
+# Blog App — VueJS Frontend
 
 A VueJS 3 frontend for the S87 Blog API. Covers both S88 deliverables:
-- ✅ VueJS app with CRUD (Create, Read, Update, Delete posts)
-- ✅ VueJS app with Authentication (Register, Login, JWT-protected routes)
+-  VueJS app with CRUD (Create, Read, Update, Delete posts)
+- VueJS app with Authentication (Register, Login, JWT-protected routes)
 
 ---
 
