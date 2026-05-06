@@ -14,7 +14,6 @@ const routes = [
   { path: '/login', component: LoginView, meta: { guestOnly: true } },
   { path: '/register', component: RegisterView, meta: { guestOnly: true } },
   { path: '/posts', component: PostsView },
-  // IMPORTANT: /posts/create must be BEFORE /posts/:id
   { path: '/posts/create', component: CreatePostView, meta: { requiresAuth: true } },
   { path: '/posts/:id', component: PostDetailView },
   { path: '/posts/:id/edit', component: EditPostView, meta: { requiresAuth: true } },
