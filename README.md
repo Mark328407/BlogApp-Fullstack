@@ -1,4 +1,4 @@
-# Blog App — VueJS Frontend
+# Blog App — FullStack
 
 A VueJS 3 frontend for the S87 Blog API. Covers both S88 deliverables:
 -  VueJS app with CRUD (Create, Read, Update, Delete posts)
