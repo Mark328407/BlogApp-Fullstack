@@ -1,0 +1,20 @@
+{
+  "name": "s88-blog-vue",
+  "version": "1.0.0",
+  "description": "S88 Blog App - VueJS Frontend with CRUD and Authentication",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.0",
+    "vue-router": "^4.3.0",
+    "pinia": "^2.1.0",
+    "axios": "^1.7.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.0.0"
+  }
+}
