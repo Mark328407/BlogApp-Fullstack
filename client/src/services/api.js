@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'https://blogapp-fullstack-az9o.onrender.com/api',
+  baseURL: 'https://blogapp-fullstack-az9o.onrender.com/',
 })
 
 
